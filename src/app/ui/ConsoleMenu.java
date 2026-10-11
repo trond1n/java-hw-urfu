@@ -8,13 +8,12 @@ import app.service.StudentService;
 import app.validation.StudentValidator;
 import app.validation.ValidationException;
 
-
 import java.io.IOException;
+import java.nio.file.InvalidPathException;
 import java.nio.file.NoSuchFileException;
 import java.util.List;
 
 public class ConsoleMenu {
-
     private static final String DEFAULT_FILE_PATH = "data/students.csv";
 
     private final ConsoleInput consoleInput;
@@ -33,7 +32,6 @@ public class ConsoleMenu {
         this.studentFileLoader = studentFileLoader;
         this.studentService = studentService;
     }
-
 
     public void run() {
         System.out.println("Консольное меню запущено...");
@@ -114,16 +112,15 @@ public class ConsoleMenu {
 
         try {
             List<Student> students = studentFileLoader.load(path);
-
             studentRepository.addAll(students);
-
             System.out.println("Загружено студентов: " + students.size());
 
         } catch (NoSuchFileException e) {
             System.out.println("Файл не найден: " + path);
-
         } catch (IOException e) {
             System.out.println("Ошибка чтения: " + e.getMessage());
+        } catch (InvalidPathException e) {
+            System.out.println("Некорректный путь к файлу: " + path);
         }
     }
 

@@ -5,7 +5,6 @@ public class Student {
     private final double averageGrade;
     private final String recordBookNumber;
 
-
     public Student(String name, double averageGrade, String recordBookNumber) {
         this.name = name;
         this.averageGrade = averageGrade;
@@ -30,4 +29,3 @@ public class Student {
                 name, averageGrade, recordBookNumber);
     }
 }
-

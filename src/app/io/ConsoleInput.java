@@ -3,7 +3,6 @@ package app.io;
 import java.util.Scanner;
 
 public class ConsoleInput {
-
     private final Scanner scanner;
 
     public ConsoleInput(Scanner scanner) {
@@ -12,6 +11,9 @@ public class ConsoleInput {
 
     public String readLine(String prompt) {
         System.out.print(prompt);
+        if (!scanner.hasNextLine()) {
+            System.exit(0);
+        }
         return scanner.nextLine().trim();
     }
 
@@ -25,11 +27,11 @@ public class ConsoleInput {
             }
         }
     }
-    public double readDouble(String prompt)  {
+
+    public double readDouble(String prompt) {
         while (true) {
             String input = readLine(prompt);
             try {
-
                 return Double.parseDouble(input.replace(',', '.'));
             } catch (NumberFormatException e) {
                 System.out.println("Ошибка: некорректное значение.");

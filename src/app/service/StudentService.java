@@ -24,13 +24,12 @@ public class StudentService {
                 .sorted(Comparator.comparingDouble(Student::getAverageGrade))
                 .toList();
     }
-    public void printReport(List<Student> students, double minGrade) {
 
+    public void printReport(List<Student> students, double minGrade) {
         students.stream()
                 .filter(s -> s.getAverageGrade() >= minGrade)
                 .sorted(Comparator.comparingDouble(Student::getAverageGrade).reversed())
                 .map(s -> s.getName().toUpperCase())
                 .forEach(System.out::println);
     }
-
 }

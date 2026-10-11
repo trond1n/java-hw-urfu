@@ -42,10 +42,8 @@ public class StudentFileLoader {
                 } catch (ValidationException e) {
                     System.out.println("Строка " + lineNumber + " пропущена: " + e.getMessage());
                 }
-
             }
         }
         return result;
     }
 }
-

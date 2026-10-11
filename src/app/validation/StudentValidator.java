@@ -3,7 +3,6 @@ package app.validation;
 import app.model.Student;
 
 public class StudentValidator {
-
     private static final String NAME_REGEX =
             "^[A-ZА-ЯЁ][a-zа-яё]+(?:[- ][A-ZА-ЯЁ][a-zа-яё]+)*$";
 
@@ -20,7 +19,6 @@ public class StudentValidator {
             );
         }
     }
-
 
     public static void validateGrade(double grade) throws ValidationException {
         if (grade < 0.0 || grade > 5.0) {
