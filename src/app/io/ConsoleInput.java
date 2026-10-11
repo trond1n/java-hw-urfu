@@ -25,12 +25,12 @@ public class ConsoleInput {
             }
         }
     }
-    public int readDouble(String prompt)  {
+    public double readDouble(String prompt)  {
         while (true) {
             String input = readLine(prompt);
             try {
 
-                return (int) Double.parseDouble(input.replace(',', '.'));
+                return Double.parseDouble(input.replace(',', '.'));
             } catch (NumberFormatException e) {
                 System.out.println("Ошибка: некорректное значение.");
             }
