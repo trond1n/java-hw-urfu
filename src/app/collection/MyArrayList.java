@@ -56,7 +56,7 @@ public class MyArrayList<T> implements Iterable<T> {
 
     @Override
     public String toString() {
-        return stream().map(String::valueOf).collect(Collectors.joining(", ", "[", "]"));
+        return stream().map(String::valueOf).collect(Collectors.joining(System.lineSeparator()));
     }
 
     @Override

@@ -12,7 +12,7 @@ public class ConsoleInput {
     public String readLine(String prompt) {
         System.out.print(prompt);
         if (!scanner.hasNextLine()) {
-            System.exit(0);
+            throw new InputClosedException();
         }
         return scanner.nextLine().trim();
     }

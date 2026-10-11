@@ -1,6 +1,7 @@
 package app.ui;
 
 import app.io.ConsoleInput;
+import app.io.InputClosedException;
 import app.io.StudentFileLoader;
 import app.model.Student;
 import app.repository.StudentRepository;
@@ -43,24 +44,30 @@ public class ConsoleMenu {
 
     public void run() {
         System.out.println("Консольное меню запущено...");
-        while (true) {
-            printMenu();
+        try {
+            while (true) {
+                printMenu();
 
-            int command = consoleInput.readInt("Выберите пункт меню: ");
+                int command = consoleInput.readInt("Выберите пункт меню: ");
 
-            switch (command) {
-                case 1 -> addManually();
-                case 2 -> loadFromFile();
-                case 3 -> processData();
-                case 4 -> showAll();
-                case 5 -> removeStudent();
-                case 6 -> sortWithCustomAlgorithm();
-                case 0 -> {
-                    System.out.println("Завершение работы программы...");
-                    return;
+                switch (command) {
+                    case 1 -> addManually();
+                    case 2 -> loadFromFile();
+                    case 3 -> processData();
+                    case 4 -> showAll();
+                    case 5 -> removeStudent();
+                    case 6 -> sortWithCustomAlgorithm();
+                    case 7 -> showStudentByNumber();
+                    case 0 -> {
+                        System.out.println("Завершение работы программы...");
+                        return;
+                    }
+                    default -> System.out.println("Неизвестная команда.");
                 }
-                default -> System.out.println("Неизвестная команда.");
             }
+        } catch (InputClosedException e) {
+            System.out.println();
+            System.out.println("Ввод завершён. Завершение работы программы...");
         }
     }
 
@@ -139,6 +146,7 @@ public class ConsoleMenu {
                 4. Показать всех студентов
                 5. Удалить студента
                 6. Выбрать алгоритм сортировки
+                7. Найти студента
                 0. Выход
                 """);
     }
@@ -194,10 +202,32 @@ public class ConsoleMenu {
         }
 
         int number = consoleInput.readInt("Введите номер студента для удаления: ");
-
         try {
             Student removed = studentRepository.remove(number - 1);
             System.out.println("Удалён студент: " + removed);
+        } catch (IndexOutOfBoundsException e) {
+            System.out.println("Нет студента с номером " + number + ".");
+        }
+    }
+
+    private void showStudentByNumber() {
+        List<Student> students = studentRepository.getAll();
+
+        if (students.isEmpty()) {
+            System.out.println("Список пуст.");
+            return;
+        }
+
+        System.out.println("Список студентов:");
+
+        for (int i = 0; i < students.size(); i++) {
+            System.out.println((i + 1) + ". " + students.get(i));
+        }
+
+        int number = consoleInput.readInt("Введите номер студента: ");
+
+        try {
+            System.out.println(studentRepository.get(number - 1));
         } catch (IndexOutOfBoundsException e) {
             System.out.println("Нет студента с номером " + number + ".");
         }
@@ -226,18 +256,13 @@ public class ConsoleMenu {
     }
 
     private void showAll() {
-        List<Student> students = studentRepository.getAll();
-
-        if (students.isEmpty()) {
+        if (studentRepository.isEmpty()) {
             System.out.println("Список пуст.");
             return;
         }
 
-        System.out.println("Список студентов:");
-
-        for (Student student : students) {
-            System.out.println(student);
-        }
+        System.out.println("Список студентов (" + studentRepository.size() + "):");
+        System.out.println(studentRepository);
     }
 
     private void processData() {
@@ -249,10 +274,11 @@ public class ConsoleMenu {
         }
         double threshold = consoleInput.readDouble("Введите порог балла: ");
 
-        if (studentService.filterByMinGrade(students, threshold).isEmpty()) {
+        List<Student> passed = studentService.filterByMinGrade(students, threshold);
+        if (passed.isEmpty()) {
             System.out.println("Никто не прошел порог " + threshold + ".");
             return;
         }
-        studentService.printReport(students, threshold);
+        studentService.printReport(passed);
     }
 }

@@ -33,4 +33,13 @@ public class StudentRepository {
     public Student remove(int index) {
         return students.remove(index);
     }
+
+    public Student get(int index) {
+        return students.get(index);
+    }
+
+    @Override
+    public String toString() {
+        return students.toString();
+    }
 }
