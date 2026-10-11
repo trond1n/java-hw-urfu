@@ -45,6 +45,7 @@ public class ConsoleMenu {
                 case 2 -> loadFromFile();
                 case 3 -> processData();
                 case 4 -> showAll();
+                case 5 -> removeStudent();
                 case 0 -> {
                     System.out.println("Завершение работы программы...");
                     return;
@@ -62,6 +63,7 @@ public class ConsoleMenu {
                 2. Загрузить данные из файла
                 3. Обработать данные
                 4. Показать всех студентов
+                5. Удалить студента
                 0. Выход
                 """);
     }
@@ -99,6 +101,30 @@ public class ConsoleMenu {
 
         } catch (ValidationException e) {
             System.out.println("Ошибка валидации: " + e.getMessage());
+        }
+    }
+
+    private void removeStudent() {
+        List<Student> students = studentRepository.getAll();
+
+        if (students.isEmpty()) {
+            System.out.println("Список пуст.");
+            return;
+        }
+
+        System.out.println("Список студентов:");
+
+        for (int i = 0; i < students.size(); i++) {
+            System.out.println((i + 1) + ". " + students.get(i));
+        }
+
+        int number = consoleInput.readInt("Введите номер студента для удаления: ");
+
+        try {
+            Student removed = studentRepository.remove(number - 1);
+            System.out.println("Удалён студент: " + removed);
+        } catch (IndexOutOfBoundsException e) {
+            System.out.println("Нет студента с номером " + number + ".");
         }
     }
 
