@@ -5,12 +5,16 @@ import app.io.StudentFileLoader;
 import app.model.Student;
 import app.repository.StudentRepository;
 import app.service.StudentService;
+import app.sort.BubbleSort;
+import app.sort.InsertionSort;
+import app.sort.SortAlgorithm;
 import app.validation.StudentValidator;
 import app.validation.ValidationException;
 
 import java.io.IOException;
 import java.nio.file.InvalidPathException;
 import java.nio.file.NoSuchFileException;
+import java.util.Comparator;
 import java.util.List;
 
 public class ConsoleMenu {
@@ -20,6 +24,10 @@ public class ConsoleMenu {
     private final StudentRepository studentRepository;
     private final StudentFileLoader studentFileLoader;
     private final StudentService studentService;
+    private final List<SortAlgorithm<Student>> algorithms = List.of(
+            new BubbleSort<>(),
+            new InsertionSort<>()
+    );
 
     public ConsoleMenu(
             ConsoleInput consoleInput,
@@ -46,12 +54,78 @@ public class ConsoleMenu {
                 case 3 -> processData();
                 case 4 -> showAll();
                 case 5 -> removeStudent();
+                case 6 -> sortWithCustomAlgorithm();
                 case 0 -> {
                     System.out.println("Завершение работы программы...");
                     return;
                 }
                 default -> System.out.println("Неизвестная команда.");
             }
+        }
+    }
+
+    private void sortWithCustomAlgorithm() {
+        List<Student> students = studentRepository.getAll();
+
+        if (students.isEmpty()) {
+            System.out.println("Список пуст.");
+            return;
+        }
+
+        System.out.println("Доступные алгоритмы:");
+
+        for (int i = 0; i < algorithms.size(); i++) {
+            System.out.println((i + 1) + ". " + algorithms.get(i).getName());
+        }
+
+        int algorithmNumber = consoleInput.readInt("Выберите сортировку: ");
+
+        if (algorithmNumber < 1 || algorithmNumber > algorithms.size()) {
+            System.out.println("Нет алгоритма с номером " + algorithmNumber + ".");
+            return;
+        }
+
+        System.out.println("""
+                Поле сортировки:
+                1. По баллу
+                2. По имени
+                """);
+
+        int fieldChoice = consoleInput.readInt("Выберите поле: ");
+
+        Comparator<Student> comparator = switch (fieldChoice) {
+            case 1 -> Comparator.comparingDouble(Student::getAverageGrade);
+            case 2 -> Comparator.comparing(Student::getName);
+            default -> null;
+        };
+
+        if (comparator == null) {
+            System.out.println("Неизвестное поле сортировки.");
+            return;
+        }
+
+        System.out.println("""
+                Направление сортировки:
+                1. По возрастанию
+                2. По убыванию
+                """);
+
+        int direction = consoleInput.readInt("Выберите направление: ");
+
+        if (direction == 2) {
+            comparator = comparator.reversed();
+        } else if (direction != 1) {
+            System.out.println("Неизвестное направление сортировки.");
+            return;
+        }
+
+        SortAlgorithm<Student> algorithm = algorithms.get(algorithmNumber - 1);
+        List<Student> sortedStudents = algorithm.sort(students, comparator);
+
+        System.out.println("Результат сортировки:");
+
+        for (Student student : sortedStudents) {
+            System.out.println(student);
         }
     }
 
@@ -64,6 +138,7 @@ public class ConsoleMenu {
                 3. Обработать данные
                 4. Показать всех студентов
                 5. Удалить студента
+                6. Выбрать алгоритм сортировки
                 0. Выход
                 """);
     }
