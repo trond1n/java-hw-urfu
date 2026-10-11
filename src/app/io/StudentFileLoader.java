@@ -28,7 +28,7 @@ public class StudentFileLoader {
                 }
                 String[] parts = line.split(";", -1);
                 if (parts.length != 3) {
-                    System.out.println("ожидалось 3 поля, найдено " + parts.length);
+                    System.out.println("Строка " + lineNumber + " пропущена: ожидалось 3 поля, найдено " + parts.length);
                     continue;
                 }
                 try {
@@ -37,7 +37,9 @@ public class StudentFileLoader {
                     String number = parts[2].trim();
 
                     result.add(StudentValidator.createValidated(name, grade, number));
-                } catch (NumberFormatException | ValidationException e) {
+                } catch (NumberFormatException e) {
+                    System.out.println("Строка " + lineNumber + " пропущена: некорректный балл \"" + parts[1].trim() + "\"");
+                } catch (ValidationException e) {
                     System.out.println("Строка " + lineNumber + " пропущена: " + e.getMessage());
                 }
 
