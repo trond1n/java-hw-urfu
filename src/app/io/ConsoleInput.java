@@ -29,7 +29,8 @@ public class ConsoleInput {
         while (true) {
             String input = readLine(prompt);
             try {
-                return (int) Double.parseDouble(input);
+
+                return (int) Double.parseDouble(input.replace(',', '.'));
             } catch (NumberFormatException e) {
                 System.out.println("Ошибка: некорректное значение.");
             }

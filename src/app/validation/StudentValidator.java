@@ -24,7 +24,6 @@ public class StudentValidator {
 
     public static Student createValidated(String name, double grade, String number)
             throws ValidationException {
-        // TODO: вызвать три проверки, затем вернуть new Student(...)
         validateName(name);
         validateGrade(grade);
         validateRecordBookNumber(number);
