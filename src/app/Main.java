@@ -1,24 +1,23 @@
 package app;
 
-import app.io.ConsoleInput;
 import app.io.StudentFileLoader;
 import app.model.Student;
 import app.repository.StudentRepository;
+import app.service.StudentService;
 import app.validation.StudentValidator;
 import app.validation.ValidationException;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Scanner;
 
 public class Main {
 
     public static void main(String[] args) {
         System.out.println("=== Шаги 2–4: модель и валидация ===");
-        checkCreate("", 4.5, "123456");             // пустое имя
-        checkCreate("Иван", 7, "123456");           // балл вне 0..5
-        checkCreate("Иван", 4.5, "abc");            // зачётка не 6 цифр
-        checkCreate("Иван Петров", 4.5, "123456");  // всё верно
+        checkCreate("", 4.5, "123456");
+        checkCreate("Иван", 7, "123456");
+        checkCreate("Иван", 4.5, "abc");
+        checkCreate("Иван Петров", 4.5, "123456");
 
         System.out.println("\n=== Шаг 5: репозиторий ===");
         StudentRepository repository = new StudentRepository();
@@ -30,7 +29,7 @@ public class Main {
         }
         System.out.println("Размер после add: " + repository.size());
         try {
-            repository.getAll().clear();   // пытаемся испортить список снаружи
+            repository.getAll().clear();
         } catch (UnsupportedOperationException e) {
             System.out.println("getAll() вернул неизменяемую копию — ок");
         }
@@ -42,7 +41,6 @@ public class Main {
             List<Student> loaded = loader.load("data/students.csv");
             repository.addAll(loaded);
             System.out.println("Загружено: " + loaded.size());
-            loaded.forEach(System.out::println);
             System.out.println("Всего в репозитории: " + repository.size());
         } catch (IOException e) {
             System.out.println("Ошибка чтения: " + e.getMessage());
@@ -54,14 +52,33 @@ public class Main {
                     + " — " + e.getMessage());
         }
 
-        System.out.println("\n=== Шаг 6: ввод с консоли ===");
-        try (Scanner scanner = new Scanner(System.in)) {
-            ConsoleInput input = new ConsoleInput(scanner);
-            int number = input.readInt("Целое число (сначала введи abc): ");
-            double grade = input.readDouble("Балл (введи 4,5 с запятой): ");
-            String name = input.readLine("Имя (с пробелами по краям): ");
-            System.out.println("Получено: " + number + " | " + grade + " | [" + name + "]");
-        }
+        System.out.println("\n=== Шаг 9: Stream API ===");
+        StudentService service = new StudentService();
+        List<Student> all = repository.getAll();
+
+        System.out.println("\n-- 9.1 filter: балл >= 4.0 --");
+        service.filterByMinGrade(all, 4.0).forEach(System.out::println);
+
+        System.out.println("\n-- 9.1 filter: балл >= 5.0 (ждём пустой результат) --");
+        List<Student> nobody = service.filterByMinGrade(all, 5.0);
+        System.out.println("Найдено: " + nobody.size());
+
+        System.out.println("\n-- 9.2 map: имена --");
+        service.mapToNames(all).forEach(System.out::println);
+
+        System.out.println("\n-- 9.3 sorted: по баллу по возрастанию --");
+        service.sortByGrade(all).forEach(System.out::println);
+
+        System.out.println("\n-- Исходный список не изменился? --");
+        System.out.println("Первый в репозитории: " + repository.getAll().get(0).getName());
+        System.out.println("Размер: " + repository.size());
+
+        System.out.println("\n-- 9.4 printReport: балл >= 4.0, по убыванию --");
+        service.printReport(all, 4.0);
+
+        System.out.println("\n-- printReport на пустом списке (не должен упасть) --");
+        service.printReport(List.of(), 4.0);
+        System.out.println("ок, не упал");
     }
 
     private static void checkCreate(String name, double grade, String number) {
